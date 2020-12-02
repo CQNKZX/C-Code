@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Schema xmlns="http://schemas.microsoft.com/ado/2009/11/edm" xmlns:cg="http://schemas.microsoft.com/ado/2006/04/codegeneration" xmlns:store="http://schemas.microsoft.com/ado/2007/12/edm/EntityStoreSchemaGenerator" Namespace="Portfolio" Alias="Self" xmlns:annotation="http://schemas.microsoft.com/ado/2009/02/edm/annotation" annotation:UseStrongSpatialTypes="false">
+  <EntityContainer Name="PortfolioContainer" annotation:LazyLoadingEnabled="true">
+    <EntitySet Name="InstrumentSet" EntityType="Portfolio.Instrument" />
+    <EntitySet Name="HistPriceSet" EntityType="Portfolio.HistPrice" />
+    <EntitySet Name="InstrumentTypeSet" EntityType="Portfolio.InstrumentType" />
+    <EntitySet Name="TradeSet" EntityType="Portfolio.Trade" />
+    <AssociationSet Name="InstrumentHistPrice" Association="Portfolio.InstrumentHistPrice">
+      <End Role="Instrument" EntitySet="InstrumentSet" />
+      <End Role="HistPrice" EntitySet="HistPriceSet" />
+    </AssociationSet>
+    <AssociationSet Name="InstrumentTypeInstrument" Association="Portfolio.InstrumentTypeInstrument">
+      <End Role="InstrumentType" EntitySet="InstrumentTypeSet" />
+      <End Role="Instrument" EntitySet="InstrumentSet" />
+    </AssociationSet>
+    <AssociationSet Name="InstrumentTrade" Association="Portfolio.InstrumentTrade">
+      <End Role="Instrument" EntitySet="InstrumentSet" />
+      <End Role="Trade" EntitySet="TradeSet" />
+    </AssociationSet>
+    <EntitySet Name="Rate_Decimal_Set" EntityType="Portfolio.Rate_Decimal_" />
+  </EntityContainer>
+  <EntityType Name="Instrument">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="CompanyName" Nullable="true" />
+    <Property Type="String" Name="Ticker" Nullable="true" />
+    <Property Type="String" Name="Exchange" Nullable="false" />
+    <Property Type="String" Name="Underlying" Nullable="true" />
+    <Property Type="Double" Name="Strike" Nullable="true" />
+    <Property Type="Double" Name="Tenor" Nullable="true" />
+    <Property Type="Boolean" Name="IsCall" Nullable="true" />
+    <Property Type="Double" Name="DigitalRebate" Nullable="true" />
+    <Property Type="Double" Name="BarrierLevel" Nullable="true" />
+    <Property Type="String" Name="BarrierType" Nullable="true" />
+    <Property Type="Int32" Name="InstrumentTypeId" Nullable="false" />
+    <NavigationProperty Name="HistPrice" Relationship="Portfolio.InstrumentHistPrice" FromRole="Instrument" ToRole="HistPrice" />
+    <NavigationProperty Name="InstrumentType1" Relationship="Portfolio.InstrumentTypeInstrument" FromRole="Instrument" ToRole="InstrumentType" />
+    <NavigationProperty Name="Trade" Relationship="Portfolio.InstrumentTrade" FromRole="Instrument" ToRole="Trade" />
+  </EntityType>
+  <EntityType Name="HistPrice">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="DateTime" Name="Date" Nullable="false" />
+    <Property Type="Double" Name="ClosePrice" Nullable="false" />
+    <Property Type="Int32" Name="InstrumentId" Nullable="false" />
+    <NavigationProperty Name="Instrument" Relationship="Portfolio.InstrumentHistPrice" FromRole="HistPrice" ToRole="Instrument" />
+  </EntityType>
+  <EntityType Name="InstrumentType">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="String" Name="InstrTypeName" Nullable="false" />
+    <NavigationProperty Name="Instrument" Relationship="Portfolio.InstrumentTypeInstrument" FromRole="InstrumentType" ToRole="Instrument" />
+  </EntityType>
+  <EntityType Name="Trade">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Boolean" Name="IsBuy" Nullable="false" />
+    <Property Type="Double" Name="Quantity" Nullable="false" />
+    <Property Type="DateTime" Name="TimeStamp" Nullable="false" />
+    <Property Type="Double" Name="Price" Nullable="false" />
+    <Property Type="Int32" Name="InstrumentId" Nullable="false" />
+    <NavigationProperty Name="Instrument" Relationship="Portfolio.InstrumentTrade" FromRole="Trade" ToRole="Instrument" />
+  </EntityType>
+  <Association Name="InstrumentHistPrice">
+    <End Type="Portfolio.Instrument" Role="Instrument" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Type="Portfolio.HistPrice" Role="HistPrice" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Instrument">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="HistPrice">
+        <PropertyRef Name="InstrumentId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="InstrumentTypeInstrument">
+    <End Type="Portfolio.InstrumentType" Role="InstrumentType" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Type="Portfolio.Instrument" Role="Instrument" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="InstrumentType">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Instrument">
+        <PropertyRef Name="InstrumentTypeId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <Association Name="InstrumentTrade">
+    <End Type="Portfolio.Instrument" Role="Instrument" Multiplicity="1">
+      <OnDelete Action="Cascade" />
+    </End>
+    <End Type="Portfolio.Trade" Role="Trade" Multiplicity="*" />
+    <ReferentialConstraint>
+      <Principal Role="Instrument">
+        <PropertyRef Name="Id" />
+      </Principal>
+      <Dependent Role="Trade">
+        <PropertyRef Name="InstrumentId" />
+      </Dependent>
+    </ReferentialConstraint>
+  </Association>
+  <EntityType Name="Rate_Decimal_">
+    <Key>
+      <PropertyRef Name="Id" />
+    </Key>
+    <Property Type="Int32" Name="Id" Nullable="false" annotation:StoreGeneratedPattern="Identity" />
+    <Property Type="Double" Name="Decimal_Rate" Nullable="false" />
+    <Property Type="Double" Name="Tenor_Year" Nullable="false" />
+  </EntityType>
+</Schema>
